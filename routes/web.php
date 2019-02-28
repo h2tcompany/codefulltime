@@ -15,6 +15,7 @@ Route::get('/{code}','PasteController@GetPaste');
 Route::get('/a/{code}','PasteController@GetPasteA');
 
 Route::get('/paste/all','PasteController@Pastes');
+Route::get('/paste/search','PasteController@Search');
 
 Route::post('/paste/edit-paste','PasteController@EditPaste');
 Route::get('/paste/new-paste','PasteController@CreatePastePage');

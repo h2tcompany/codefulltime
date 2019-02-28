@@ -29,22 +29,19 @@
         </div>
         <!-- Collection of nav links, forms, and other content for toggling -->
         <div id="navbarCollapse" class="collapse navbar-collapse">
-
-
             <ul class="nav navbar-nav">
-                <li class="active" id="lienhe"><a href="#"><span class="glyphicon glyphicon-stats"></span> Paste</a></li>
+                <li class="active" id="lienhe"><a href="/paste/all"><span class="glyphicon glyphicon-stats"></span> Paste</a></li>
             </ul>
 
             <div class="navbar-form navbar-left">
-                <div class="form-group">
-                    <input list="browsers" type="text" autocomplete="off" id="key" class="form-control"
-                           value=""
-                           placeholder="Anything in website">
-                    <datalist id="browsers">
-                            <option value="GGG">GGG</option>
-                    </datalist>
-                </div>
-                <button type="submit" id="btnSearch" class="btn btn-default">Search</button>
+                <form action="/paste/search">
+                    <div class="form-group">
+                        <input type="text" name="key" id="key" class="form-control"
+                               value=""
+                               placeholder="Anything in website">
+                    </div>
+                    <button type="submit" id="btnSearch" class="btn btn-default">Search</button>
+                </form>
             </div>
 
         </div>

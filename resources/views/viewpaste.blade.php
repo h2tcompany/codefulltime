@@ -16,8 +16,17 @@
         @if($acc == null || ($acc != null && $acc->username != $paste->username))
             <h1><b>{{$paste->title}}</b></h1>
             <h3>Author: {{$paste->username}} | Time: {{$paste->time}} | views: {{$paste->views}}</h3>
-            <h3>{{$paste->description}}</h3>
-            <textarea id="code" name="code">{{$paste->contentpaste}}</textarea>
+            <h3>Description: {{$paste->description}}</h3>
+            <hr>
+            @if($paste->language == 'plain/text' || $paste->language == 'text/html')
+                <h3><b>Review</b></h3>
+                {!! $paste->contentpaste !!}
+                <hr>
+                <h3><b>Source</b></h3>
+                <textarea style="display: none" id="code" name="code">{{$paste->contentpaste}}</textarea>
+            @else
+                <textarea id="code" name="code">{{$paste->contentpaste}}</textarea>
+            @endif
         @endif
         @if($acc != null && $acc->username == $paste->username)
             <form action="/paste/edit-paste" method="post">
@@ -30,11 +39,12 @@
                        value="{{$paste->description}}"><br>
                 <h3>Code</h3>
                 <textarea id="code" name="contentpaste">{{$paste->contentpaste}}</textarea><br>
-                <button class="btn btn-default">Save</button>
+                <button class="btn btn-primary">Save</button>
 
                 @endif
-                <p>Select your language:
+                <p><b>Select your language</b>:
                     <select class="form-control" onchange="selectLanguage()" name="language" id="language">
+                        <option value="plain/text">Text</option>
                         <option value="text/apl">APL</option>
                         <option value="text/x-csrc">C</option>
                         <option value="text/x-c++src">C++</option>
@@ -90,7 +100,7 @@
                         <option value="text/x-yaml">YAML</option>
                     </select>
                 </p>
-                <p>Select a theme: <select class="form-control" onchange="selectTheme()" id="theme">
+                <p><b>Select a theme</b>: <select class="form-control" onchange="selectTheme()" id="theme">
 
                         <option selected>dracula</option>
                         <option>isotope</option>
@@ -100,10 +110,10 @@
                         <option>xq-dark</option>
                     </select>
                 </p>
-                <h3>Tag</h3>
+                <h3><b>Tag</b></h3>
                 <input class="form-control" type="text" name="tag" id="tag" placeholder=""
                        value="{{$paste->tag}}">
-                <h3>Slug</h3>
+                <h3><b>Slug</b></h3>
                 <input class="form-control" type="text" name="slug" id="slug" placeholder=""
                        value="{{$paste->slug}}">
             </form>
@@ -150,8 +160,10 @@
                     },
                     success: function (data) {
                         if(data.status === 'ok'){
+                            @if($acc!=null)
                             $('#down').append('<p><b style="color: red">{{$acc->username}}</b>: '+$('#my-question').val()+'</p>\n' +
-                                '                        <hr>')
+                                '                        <hr>');
+                            @endif
                         }
                     }
                 });
@@ -176,7 +188,7 @@
                 }
             },
             scrollbarStyle: "simple",
-            mode: {name: "text/x-java", globalVars: true},
+            mode: {name: "{{$paste->language}}", globalVars: true},
             lineWrapping: true,
             foldGutter: true,
             gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
@@ -198,12 +210,13 @@
         }
 
         @if($acc == null || ($acc!=null && $acc->username != $paste->username ))
-        editor.setOption("readOnly", 'nocursor');
-        document.getElementById('slug').disabled = true;
-        document.getElementById('tag').disabled = true;
-        document.getElementById('theme').disabled = true;
-        document.getElementById('language').disabled = true;
-                @endif
+            document.getElementById('slug').readOnly = 'readOnly';
+            document.getElementById('tag').readOnly = 'readOnly';
+            document.getElementById('theme').disabled = true;
+            document.getElementById('language').disabled = true;
+            editor.setOption("readOnly", 'nocursor');
+        @endif
+
         var choice = (location.hash && location.hash.slice(1)) ||
             (document.location.search &&
                 decodeURIComponent(document.location.search.slice(1)));

@@ -26,7 +26,7 @@
             <input class="form-control" type="text" name="description" placeholder=""><br>
             <h3>Content</h3>
             <textarea id="code" name="contentpaste"></textarea><br>
-            <button class="btn btn-default">Save</button>
+            <button class="btn btn-primary">Save</button>
 
             <p>Select your language:
                 <select class="form-control" onchange="selectLanguage()" name="language" id="language">
