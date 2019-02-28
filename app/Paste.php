@@ -16,4 +16,9 @@ class Paste extends Model
     public function getAccount(){
         return $this->belongsTo('App\\Paste','username');
     }
+
+    public function listComment()
+    {
+        return $this->hasMany('App\\Comment', 'code')->orderBy('id','desc');
+    }
 }

@@ -11,10 +11,14 @@
 |
 */
 
-Route::get('/paste/{code}','PasteController@GetPaste');
+Route::get('/{code}','PasteController@GetPaste');
+Route::get('/a/{code}','PasteController@GetPasteA');
 
-Route::get('/paste','PasteController@Pastes');
+Route::get('/paste/all','PasteController@Pastes');
 
-Route::post('/edit-paste','PasteController@EditPaste');
-Route::get('/new-paste','PasteController@CreatePastePage');
-Route::post('/new-paste','PasteController@CreatePaste');
+Route::post('/paste/edit-paste','PasteController@EditPaste');
+Route::get('/paste/new-paste','PasteController@CreatePastePage');
+Route::post('/paste/new-paste','PasteController@CreatePaste');
+
+
+Route::get('/comment/add-new','CommentController@add');

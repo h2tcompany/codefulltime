@@ -13,21 +13,28 @@ class PasteController extends Controller
     public function Pastes()
     {
         $listPaste = Paste::paginate(30);
-        return view('listpaste', ['pastes' => $listPaste]);
+        return view('listpaste', ['pastes' => $listPaste, 'title' => 'List paste']);
     }
 
     public function GetPaste(Request $request)
     {
         $code = $request->code;
         $paste = Paste::where('code', $code)->first();
-        $acc = Account::where('username', 'unknow')->first();
-        Session::put('acc', $acc);
-        return view('viewpaste', ['paste' => $paste]);
+        addView($paste);
+        return view('viewpaste', ['paste' => $paste, 'title' => $paste->title]);
+    }
+
+    public function GetPasteA(Request $request)
+    {
+        $code = $request->code;
+        $paste = Paste::where('slug', $code)->first();
+        addView($paste);
+        return view('viewpaste', ['paste' => $paste, 'title' => $paste->title]);
     }
 
     public function CreatePastePage()
     {
-        return view('createpaste');
+        return view('createpaste', ['title' => 'Create new paste']);
     }
 
     public function EditPaste(Request $request)
@@ -37,13 +44,17 @@ class PasteController extends Controller
         $description = $request->description;
         $title = $request->title;
         $language = $request->language;
+        $tag = $request->tag;
+        $slug = $request->slug;
         Paste::where('code', $code)->update([
             'contentpaste' => $contentpaste,
             'description' => $description,
             'title' => $title,
-            'language' => $language
+            'language' => $language,
+            'tag' => $tag,
+            'slug' => $slug,
         ]);
-        return redirect('/paste/' . $code);
+        return redirect('/' . $code);
     }
 
     public function CreatePaste(Request $request)
@@ -56,6 +67,8 @@ class PasteController extends Controller
         $language = $request->language;
         $time = date('Y-m-d');
         $username = 'unknow';
+        $tag = $request->tag;
+        $slug = $request->slug;
         if (Session::get('acc') != null) {
             $username = Session::get('acc')->username;
         }
@@ -67,10 +80,20 @@ class PasteController extends Controller
         $paste->language = $language;
         $paste->time = $time;
         $paste->username = $username;
+        $paste->tag = $tag;
+        $paste->slug = $slug;
+        $paste->views = 0;
         $paste->save();
-        return redirect('/paste/' . $code);
+        return redirect('/' . $code);
     }
 
+}
+
+function addView($paste){
+    $oldview = $paste->views;
+    Paste::where('code',$paste->code)->update([
+       'views'=>$oldview+1
+    ]);
 }
 
 function rand_string($length)
