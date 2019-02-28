@@ -1,9 +1,16 @@
 @extends('templates')
 @section('content')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
+
     <script>
         $(document).ready(function () {
             var lang = '{{$paste->language}}';
             $('#language option[value="' + lang + '"]').attr('selected', 'selected');
+            @if($paste->language == 'markdown')
+                var converter = new showdown.Converter();
+                let text = '{{$paste->contentpaste}}';
+                $('#content').html(converter.makeHtml(text));
+            @endif
         });
     </script>
 
@@ -19,11 +26,14 @@
             <h3>Description: {{$paste->description}}</h3>
             <hr>
             @if($paste->language == 'plain/text' || $paste->language == 'text/html')
-                <h3><b>Review</b></h3>
+                <h3><b>Content</b></h3>
                 {!! $paste->contentpaste !!}
                 <hr>
-                <h3><b>Source</b></h3>
-                <textarea style="display: none" id="code" name="code">{{$paste->contentpaste}}</textarea>
+
+            @elseif($paste->language == 'markdown')
+                <h3><b>Content</b></h3>
+                <div id="content"></div>
+                <hr>
             @else
                 <textarea id="code" name="code">{{$paste->contentpaste}}</textarea>
             @endif
@@ -40,8 +50,7 @@
                 <h3>Code</h3>
                 <textarea id="code" name="contentpaste">{{$paste->contentpaste}}</textarea><br>
                 <button class="btn btn-primary">Save</button>
-
-                @endif
+        @endif
                 <p><b>Select your language</b>:
                     <select class="form-control" onchange="selectLanguage()" name="language" id="language">
                         <option value="plain/text">Text</option>
@@ -78,7 +87,7 @@
                         <option value="text/x-less">Less</option>
                         <option value="text/x-livescript">LiveScript</option>
                         <option value="text/x-lua">Lua</option>
-                        <option value="text/x-markdown">Markdown</option>
+                        <option value="markdown">Markdown</option>
                         <option value="text/x-pascal">Pascal</option>
                         <option value="text/x-perl">Perl</option>
                         <option value="application/x-httpd-php">PHP with html</option>
@@ -100,8 +109,9 @@
                         <option value="text/x-yaml">YAML</option>
                     </select>
                 </p>
-                <p><b>Select a theme</b>: <select class="form-control" onchange="selectTheme()" id="theme">
 
+                @if($paste->language != 'plain/text' && $paste->language != 'text/html'&& $paste->language != 'markdown')
+                <p><b>Select a theme</b>: <select class="form-control" onchange="selectTheme()" id="theme">
                         <option selected>dracula</option>
                         <option>isotope</option>
                         <option>midnight</option>
@@ -110,6 +120,8 @@
                         <option>xq-dark</option>
                     </select>
                 </p>
+                @endif
+
                 <h3><b>Tag</b></h3>
                 <input class="form-control" type="text" name="tag" id="tag" placeholder=""
                        value="{{$paste->tag}}">
@@ -149,7 +161,12 @@
 
 
     <script>
-
+        @if($acc == null || ($acc!=null && $acc->username != $paste->username ))
+            document.getElementById('slug').readOnly = 'readOnly';
+            document.getElementById('tag').readOnly = 'readOnly';
+            document.getElementById('language').disabled = true;
+            document.getElementById('theme').disabled = true;
+        @endif
         $(document).ready(function () {
             $('#btnAnswerQuestion').on('click', function () {
                 $.ajax({
@@ -210,13 +227,8 @@
         }
 
         @if($acc == null || ($acc!=null && $acc->username != $paste->username ))
-            document.getElementById('slug').readOnly = 'readOnly';
-            document.getElementById('tag').readOnly = 'readOnly';
-            document.getElementById('theme').disabled = true;
-            document.getElementById('language').disabled = true;
             editor.setOption("readOnly", 'nocursor');
         @endif
-
         var choice = (location.hash && location.hash.slice(1)) ||
             (document.location.search &&
                 decodeURIComponent(document.location.search.slice(1)));
